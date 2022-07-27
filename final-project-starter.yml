@@ -12,21 +12,29 @@ Parameters:
       Description: Internet Gateway for internet connectivity
       Type: String
 
-  PublicSubnet-1-CIDR:
+  PublicSubnetCIDR1:
       Description: Public Subnet in the first AZ
       Type: String 
 
-  PrivateSubnet-1-CIDR:
+  PrivateSubnetCIDR1:
           Description: Private Subnet in the first AZ
           Type: String 
   
-  PublicSubnet-2-CIDR:
+  PublicSubnetCIDR2:
     Description: Public Subnet in the Second AZ
     Type: String 
 
-  PrivateSubnet-2-CIDR:
+  PrivateSubnetCIDR2:
           Description: Private Subnet in the Second AZ
+          Type: String 
+
+  ImageUsed:
+          Description: Linux Image Used as  a Parameter
           Type: String         
+
+  SecurityGroupPorts:
+          Description: Configure Firewall ports from parameter file
+          Type: String
 
 Resources:
   # instace profile contains the IAM Role name(s) that we want to associate to our auto scaling EC2 Servers
@@ -53,7 +61,7 @@ Resources:
         Properties:
             Tags:
                - Key: Name
-                 Value: !Ref IgwName
+                 Value: !Ref IGWName
 
   InternetGatewayAssociation:
         Type: AWS::EC2::VPCGatewayAttachment
@@ -64,10 +72,8 @@ Resources:
   PublicSubnet1:
         Type: AWS::EC2::Subnet
         Properties: 
-            AvailabilityZone:  !Select 
-              - 0
-              - Fn::GetAZs
-            CidrBlock: !Ref PublicSubnet-1-CIDR
+            AvailabilityZone:  !Select [ 0, !GetAZs '' ] 
+            CidrBlock: !Ref PublicSubnetCIDR1
             MapPublicIpOnLaunch: true
             Tags: 
               - Key: name
@@ -80,10 +86,8 @@ Resources:
   PrivateSubnet1:
         Type: AWS::EC2::Subnet
         Properties: 
-            AvailabilityZone:  !Select 
-              - 0
-              - Fn::GetAZs
-            CidrBlock: !Ref PrivateSubnet-1-CIDR
+            AvailabilityZone:  !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnetCIDR1
             MapPublicIpOnLaunch: false
             Tags: 
               - Key: name
@@ -96,10 +100,8 @@ Resources:
   PublicSubnet2:
       Type: AWS::EC2::Subnet
       Properties: 
-          AvailabilityZone:  !Select 
-            - 1
-            - Fn::GetAZs
-          CidrBlock: !Ref PublicSubnet-2-CIDR
+          AvailabilityZone:  !Select [ 1, !GetAZs '' ]
+          CidrBlock: !Ref PublicSubnetCIDR2
           MapPublicIpOnLaunch: true
           Tags: 
             - Key: name
@@ -109,10 +111,8 @@ Resources:
   PrivateSubnet2:
       Type: AWS::EC2::Subnet
       Properties: 
-          AvailabilityZone:  !Select 
-            - 1
-            - Fn::GetAZs
-          CidrBlock: !Ref PrivateSubnet-2-CIDR
+          AvailabilityZone:  !Select [ 1, !GetAZs '' ]
+          CidrBlock: !Ref PrivateSubnetCIDR2
           MapPublicIpOnLaunch: false
           Tags: 
             - Key: name
@@ -132,7 +132,7 @@ Resources:
       Properties: 
         Domain: vpc      
 
-  NATGateWay1:
+  NATGateway1:
       Type: AWS::EC2::NatGateway
       Properties: 
         AllocationId: !GetAtt ElasticIPAddress1.AllocationId
@@ -141,7 +141,7 @@ Resources:
         - Key: Name
           Value: !Sub ${EnvironmentName}--NatGateway1
 
-  NATGateWay2:
+  NATGateway2:
       Type: AWS::EC2::NatGateway
       Properties: 
         AllocationId: !GetAtt ElasticIPAddress2.AllocationId
@@ -152,7 +152,84 @@ Resources:
 
 
 
+  PublicRouteTable:
+      DependsOn: InternetGatewayAssociation
+      Type: AWS::EC2::RouteTable
+      Properties: 
+        Tags: 
+          - Key: Name
+            Value: !Sub ${EnvironmentName}--Public-RT
+        VpcId: !Ref VPC 
+
+  PrivateRouteTable1:
+        Type: AWS::EC2::RouteTable
+        Properties: 
+            VpcId: !Ref VPC
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+
+  PrivateRouteTable2:
+        Type: AWS::EC2::RouteTable
+        Properties: 
+            VpcId: !Ref VPC
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} Private Routes (AZ2)                      
+
+  PublicRouteRules:
+      Type: AWS::EC2::Route
+      Properties: 
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: !Ref InternetGateway
+        RouteTableId: !Ref PublicRouteTable
+
+  
+  RouteRulesForPrivSubnet1:
+      Type: AWS::EC2::Route
+      Properties: 
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: !Ref NATGateway1
+        RouteTableId: !Ref PrivateRouteTable1        
+
+  RouteRulesForPrivSubnet2:
+      Type: AWS::EC2::Route
+      Properties: 
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: !Ref NATGateway2
+        RouteTableId: !Ref PrivateRouteTable2   
+  
+  PublicSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          RouteTableId: !Ref PublicRouteTable
+          SubnetId: !Ref PublicSubnet1
+
+
+  PublicSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          RouteTableId: !Ref PublicRouteTable
+          SubnetId: !Ref PublicSubnet2
+
+  PrivateSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable1
+            SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable2
+            SubnetId: !Ref PrivateSubnet2          
+
 Outputs: 
+  VPC: 
+        Description: A reference to the created VPC
+        Value: !Ref VPC
+        Export:
+          Name: !Sub ${EnvironmentName}-VPCID
   # This is also optional.
   # Bonus points for useful outputs!
   # for example, if you create a Load Balancer

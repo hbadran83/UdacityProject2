@@ -9,26 +9,26 @@
 	},
 	{
 		"ParameterKey": "IGWName",
-		"ParameterValue": "UdacityProject-IGW"
+		"ParameterValue": "UdacityProjectIGW"
 	},
 	{
-		"ParameterKey": "PublicSubnet-1-CIDR",
+		"ParameterKey": "PublicSubnetCIDR1",
 		"ParameterValue": "10.0.0.0/24"
 	},
 	{
-		"ParameterKey": "PrivateSubnet-1-CIDR",
+		"ParameterKey": "PrivateSubnetCIDR1",
 		"ParameterValue": "10.0.2.0/24"
 	},
 	{
-		"ParameterKey": "PublicSubnet-2-CIDR",
+		"ParameterKey": "PublicSubnetCIDR2",
 		"ParameterValue": "10.0.1.0/24"
 	},
 	{
-		"ParameterKey": "PrivateSubnet-2-CIDR",
+		"ParameterKey": "PrivateSubnetCIDR2",
 		"ParameterValue": "10.0.3.0/24"
 	},
 	{
-		"ParameterKey":"SecurityGroup-Ports" ,
+		"ParameterKey":"SecurityGroupPorts" ,
 		"ParameterValue":"80"
 	},
 	{
