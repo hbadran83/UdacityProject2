@@ -1,0 +1,38 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "UdacityProject"
+	},
+	{
+		"ParameterKey": "VpcCIDR",
+		"ParameterValue": "10.0.0.0/16"
+	},
+	{
+		"ParameterKey": "IGWName",
+		"ParameterValue": "UdacityProject-IGW"
+	},
+	{
+		"ParameterKey": "PublicSubnet-1-CIDR",
+		"ParameterValue": "10.0.0.0/24"
+	},
+	{
+		"ParameterKey": "PrivateSubnet-1-CIDR",
+		"ParameterValue": "10.0.2.0/24"
+	},
+	{
+		"ParameterKey": "PublicSubnet-2-CIDR",
+		"ParameterValue": "10.0.1.0/24"
+	},
+	{
+		"ParameterKey": "PrivateSubnet-2-CIDR",
+		"ParameterValue": "10.0.3.0/24"
+	},
+	{
+		"ParameterKey":"SecurityGroup-Ports" ,
+		"ParameterValue":"80"
+	},
+	{
+		"ParameterKey":"ImageUsed" ,
+   		"ParameterValue":"ami-047a51fa27710816e"
+	}
+]
