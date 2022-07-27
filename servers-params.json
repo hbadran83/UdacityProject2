@@ -1,0 +1,27 @@
+[
+    {
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "UdacityProject"
+	},
+    {
+		"ParameterKey":"SecurityGroupPorts" ,
+		"ParameterValue":"80"
+	},
+	{
+		"ParameterKey":"ImageUsed" ,
+   		"ParameterValue":"ami-08841b3495d14efb1"
+	},
+    {
+        "ParameterKey":"InstanceType",
+        "ParameterValue":"t2.medium"
+
+
+    },
+    {
+        "ParameterKey":"DiskSpaceConfig",
+        "ParameterValue":"10"
+
+
+    }
+
+]

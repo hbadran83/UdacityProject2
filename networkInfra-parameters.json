@@ -26,13 +26,6 @@
 	{
 		"ParameterKey": "PrivateSubnetCIDR2",
 		"ParameterValue": "10.0.3.0/24"
-	},
-	{
-		"ParameterKey":"SecurityGroupPorts" ,
-		"ParameterValue":"80"
-	},
-	{
-		"ParameterKey":"ImageUsed" ,
-   		"ParameterValue":"ami-047a51fa27710816e"
 	}
+	
 ]
